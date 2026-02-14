@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nicole 🤍</title>
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background: radial-gradient(circle at top, #0f2027, #162d3d, #000814);
+  color:white;
+  text-align:center;
+  font-family:'Segoe UI',sans-serif;
+}
+
+canvas{
+  position:absolute;
+  top:0;
+  left:0;
+}
+
+.container{
+  position:relative;
+  z-index:10;
+  top:5vh;
+  padding:20px;
+}
+
+h1{
+  font-size:3rem;
+  color:#ffb6d5;
+  text-shadow:0 0 25px #ff4fa3;
+}
+
+.carta{
+  max-width:650px;
+  margin:auto;
+  margin-top:20px;
+  line-height:1.8;
+  font-size:1.05rem;
+}
+
+#contador{
+  margin-top:15px;
+  font-weight:bold;
+  color:#ff8ec7;
+  font-size:1.1rem;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="container">
+  <h1>Nicole 🤍</h1>
+
+  <div class="carta">
+    Tal vez no somos nada…<br>
+    pero quiero que sepas que desde el 2022<br>
+    mi corazón empezó a elegirte en silencio.<br><br>
+
+    Espero que en esta vida, o en alguna otra,<br>
+    pueda tener al menos una oportunidad de estar contigo,<br>
+    de hacerte feliz, de hacerte sentir querida, amada y valorada.<br>
+    Mi única intención sería hacerte la mujer más feliz de este mundo.<br><br>
+
+    Hoy, 14 de febrero, Día del Amor y la Amistad,<br>
+    solo quería que supieras que lo más bonito que me pasó<br>
+    fue haberte conocido y empezar a sentir algo por ti.<br><br>
+
+    Si alguna vez tienes o tuviste dudas…<br>
+    ahí está el contador de los días que llevo queriéndote 💗<br><br>
+
+    <b>TE QUIERO MUCHÍSIMO 💗</b>
+  </div>
+
+  <div id="contador"></div>
+</div>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+/* ---------- CONTADOR ---------- */
+const inicio=new Date("2022-01-01T00:00:00");
+
+function actualizar(){
+  const ahora=new Date();
+  const diff=ahora-inicio;
+
+  const dias=Math.floor(diff/(1000*60*60*24));
+  const horas=Math.floor(diff/(1000*60*60))%24;
+  const minutos=Math.floor(diff/(1000*60))%60;
+  const segundos=Math.floor(diff/1000)%60;
+
+  document.getElementById("contador").innerHTML=
+  dias+" días "+horas+" horas "+minutos+" minutos "+segundos+" segundos";
+}
+setInterval(actualizar,1000);
+actualizar();
+
+/* ---------- ESTRELLAS MASIVAS ---------- */
+let stars=[];
+for(let i=0;i<600;i++){
+  stars.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    size:Math.random()*2,
+    alpha:Math.random(),
+    speed:(Math.random()*0.02)+0.005
+  });
+}
+
+/* ---------- METEOROS MASIVOS ---------- */
+let meteors=[];
+setInterval(()=>{
+  meteors.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height/2,
+    length:Math.random()*120+80,
+    speed:8
+  });
+},800);
+
+/* ---------- LUNA ---------- */
+function drawMoon(){
+  ctx.beginPath();
+  ctx.arc(canvas.width-140,120,70,0,Math.PI*2);
+  ctx.fillStyle="#f5f3ce";
+  ctx.shadowBlur=50;
+  ctx.shadowColor="#ffffff";
+  ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+/* ---------- ÁRBOL ---------- */
+let branches=[];
+function createBranch(x,y,length,angle,depth){
+  if(depth===0)return;
+  let x2=x+length*Math.cos(angle);
+  let y2=y+length*Math.sin(angle);
+  branches.push({x,y,x2,y2});
+  createBranch(x2,y2,length*0.7,angle-0.5,depth-1);
+  createBranch(x2,y2,length*0.7,angle+0.5,depth-1);
+}
+createBranch(canvas.width/2,canvas.height-50,110,-Math.PI/2,9);
+
+let progress=0;
+
+/* ---------- PÉTALOS ---------- */
+let petals=[];
+setInterval(()=>{
+  petals.push({
+    x:canvas.width/2+(Math.random()*250-125),
+    y:canvas.height/2-120,
+    size:Math.random()*4+3,
+    speed:Math.random()*2+1
+  });
+},200);
+
+/* ---------- ANIMACIÓN ---------- */
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  /* estrellas */
+  for(let s of stars){
+    s.alpha+=s.speed;
+    if(s.alpha>1||s.alpha<0)s.speed*=-1;
+    ctx.globalAlpha=s.alpha;
+    ctx.fillStyle="white";
+    ctx.fillRect(s.x,s.y,s.size,s.size);
+  }
+  ctx.globalAlpha=1;
+
+  /* luna */
+  drawMoon();
+
+  /* meteoros */
+  for(let m of meteors){
+    ctx.beginPath();
+    ctx.moveTo(m.x,m.y);
+    ctx.lineTo(m.x-m.length,m.y+m.length);
+    ctx.strokeStyle="white";
+    ctx.lineWidth=2;
+    ctx.stroke();
+    m.x-=m.speed;
+    m.y+=m.speed;
+  }
+
+  /* árbol */
+  ctx.lineWidth=2;
+  ctx.strokeStyle="#ff4fa3";
+  for(let i=0;i<progress&&i<branches.length;i++){
+    ctx.beginPath();
+    ctx.moveTo(branches[i].x,branches[i].y);
+    ctx.lineTo(branches[i].x2,branches[i].y2);
+    ctx.stroke();
+  }
+  if(progress<branches.length)progress++;
+
+  /* pétalos */
+  for(let p of petals){
+    ctx.fillStyle="#ff8ec7";
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fill();
+    p.y+=p.speed;
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
